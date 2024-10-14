@@ -1,17 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_advanced_reference/core/helpers/spacing.dart';
 import 'package:flutter_advanced_reference/core/widgets/app_text_form_field.dart';
-import 'package:flutter_advanced_reference/features/login/logic/cubit/login_cubit.dart';
 import 'package:flutter_advanced_reference/features/login/ui/widgets/already_have_account_text.dart';
-import 'package:flutter_advanced_reference/features/login/ui/widgets/email_and_password.dart';
-import 'package:flutter_advanced_reference/features/login/ui/widgets/login_bloc_listener.dart';
 import 'package:flutter_advanced_reference/features/login/ui/widgets/terms_and_conditions_text.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../core/theming/styles.dart';
 import '../../../core/widgets/app_text_button.dart';
-import '../data/models/login_request_body.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -47,7 +42,27 @@ class _LoginScreenState extends State<LoginScreen> {
                   key: formKey,
                   child: Column(
                     children: [
-                      const EmailAndPassword(),
+                      const CustomTextFormField(
+                        hintText: "Email",
+                      ),
+                      verticalSpace(18),
+                      CustomTextFormField(
+                        hintText: "Password",
+                        isObscureText: isObscureText,
+                        suffixIcon: GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              isObscureText = !isObscureText;
+                            });
+                          },
+                          child: Icon(
+                            isObscureText
+                                ? Icons.visibility_off
+                                : Icons.visibility,
+                            color: Colors.grey,
+                          ),
+                        ),
+                      ),
                       verticalSpace(18),
                       Align(
                         alignment: AlignmentDirectional.centerEnd,
@@ -61,15 +76,12 @@ class _LoginScreenState extends State<LoginScreen> {
                           buttonText: "Login",
                           textStyle: TextStyles.font16WhiteSemiBold,
                           onPressed: () {
-                            if (formKey.currentState!.validate()) {
-                              validateThenDoLogin(context);
-                            }
+                            if (formKey.currentState!.validate()) {}
                           }),
                       verticalSpace(16),
                       const TermsAndConditionsText(),
                       verticalSpace(60),
-                      const AlreadyHaveAccountText(),
-                      const LoginBlocListener(),
+                      const AlreadyHaveAccountText()
                     ],
                   ))
             ],
@@ -78,16 +90,4 @@ class _LoginScreenState extends State<LoginScreen> {
       )),
     );
   }
-  void validateThenDoLogin(BuildContext context) {
-    if (context.read<LoginCubit>().formKey.currentState!.validate()) {
-      context.read<LoginCubit>().emitLoginState(
-        LoginRequestBody(
-          email: context.read<LoginCubit>().emailController.text,
-          password: context.read<LoginCubit>().passwordController.text,
-        ),
-      );
-    }
-  }
-
-
 }
